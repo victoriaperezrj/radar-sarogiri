@@ -415,7 +415,7 @@ function renderMsg(m){
 function inline(parent,text){
   text.split(/(\*\*[^*]+\*\*)/g).forEach(part=>{
     if(/^\*\*[^*]+\*\*$/.test(part))parent.append(el("strong",null,part.slice(2,-2)));
-    else if(part)parent.append(document.createTextNode(part.replace(/\*(\S[^*]*)\*/g,"$1")));
+    else if(part)parent.append(document.createTextNode(part.replace(/\*(\S[^*]*)\*/g,"$1").replace(/`([^`]*)`/g,"$1")));
   });
 }
 function mdInto(root,md){
