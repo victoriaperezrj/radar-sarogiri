@@ -53,6 +53,7 @@ jobs:
           mkdir -p _site
           cp dashboard.html _site/index.html
           cp data.js _site/data.js
+          cp clients.js _site/clients.js
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

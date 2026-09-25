@@ -10,7 +10,7 @@
 :root{
   --blue:#1f1bf2; --blue-soft:#e8e7ff; --paper:#f5f2ea; --card:#fffdf8; --ink:#141414; --muted:#6b675f; --line:#dcd6c8;
   --emergente:#ff4d2e; --creciendo:#f5a300; --pico:#1f1bf2; --saturado:#9a958b;
-  --x:#141414; --google:#1a73e8; --reddit:#ff4500; --tiktok:#ee1d52;
+  --x:#141414; --google:#1a73e8; --reddit:#ff4500; --tiktok:#ee1d52; --ok:#1d9a5b;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --blue:#7c78ff; --blue-soft:#1d1b4a; --paper:#111114; --card:#1a1a1f; --ink:#f1efe9; --muted:#9a968d; --line:#2c2c33;
@@ -23,51 +23,105 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:Archivo,system-ui,sans-serif;font-size:15px}
 .mono{font-family:"Space Mono",monospace;letter-spacing:.08em;text-transform:uppercase;font-size:11px}
-header{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:2px solid var(--blue);padding:14px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.logo{background:var(--blue);color:#fff;font-family:"Archivo Black";font-size:20px;padding:6px 14px;border-radius:999px;letter-spacing:-.02em}
-.title{font-family:"Archivo Black";font-size:22px;color:var(--blue)}
+button{font:inherit;cursor:pointer;color:inherit}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:2px solid var(--blue);padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.logo{background:var(--blue);color:#fff;font-family:"Archivo Black";font-size:18px;padding:5px 13px;border-radius:999px}
+.title{font-family:"Archivo Black";font-size:20px;color:var(--blue)}
 .spacer{flex:1}
-button{font:inherit;cursor:pointer}
-.btn{background:var(--blue);color:#fff;border:0;border-radius:999px;padding:10px 18px}
-.btn:disabled{opacity:.5;cursor:wait}
-.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:8px 12px}
-main{max-width:1320px;margin:0 auto;padding:24px}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
-.kpi b{display:block;font-family:"Archivo Black";font-size:34px;color:var(--blue);margin-top:6px}
-h2{font-family:"Archivo Black";font-size:26px;margin:0 0 4px;color:var(--blue)}
-.sub{color:var(--muted);margin:0 0 16px}
-.hot{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px}
-.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:16px}
-.filters input[type=search]{flex:1 1 220px;min-width:0;font:inherit;padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
-.chip{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px}
-.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
-.group{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.group .mono{color:var(--muted);margin-right:2px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;cursor:pointer;transition:transform .12s,border-color .12s}
-.card:hover{transform:translateY(-2px);border-color:var(--blue)}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:999px;padding:9px 16px}
+.btn:disabled{opacity:.55;cursor:default}
+.ghost{background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr) 400px;gap:18px;padding:18px 20px;align-items:start;max-width:1700px;margin:0 auto}
+aside.filters,.panel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 74px);max-height:calc(100vh - 92px);overflow:auto}
+aside.filters{display:flex;flex-direction:column;gap:18px;padding-right:4px}
+.fgroup{display:flex;flex-direction:column;gap:2px}
+.fgroup .mono{color:var(--muted);margin-bottom:4px}
+.fopt{display:flex;justify-content:space-between;align-items:center;gap:8px;background:transparent;border:0;border-radius:8px;padding:6px 9px;text-align:left;font-size:14px}
+.fopt:hover{background:var(--blue-soft)}
+.fopt.on{background:var(--blue);color:#fff}
+.fopt .n{font-family:"Space Mono";font-size:11px;opacity:.7;font-variant-numeric:tabular-nums}
+#q{width:100%;font:inherit;padding:9px 13px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.clear{align-self:flex-start;font-size:13px;background:none;border:0;color:var(--blue);padding:0;text-decoration:underline}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.kpi b{display:block;font-family:"Archivo Black";font-size:28px;color:var(--blue);margin-top:4px;font-variant-numeric:tabular-nums}
+h2{font-family:"Archivo Black";font-size:22px;margin:0 0 2px;color:var(--blue);text-wrap:balance}
+.sub{color:var(--muted);margin:0 0 12px;font-size:14px}
+.hot{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-bottom:28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:9px;transition:border-color .12s}
+.card:hover{border-color:var(--blue)}
 .card.big{border:2px solid var(--blue)}
-.card .kw{font-family:"Archivo Black";font-size:19px;line-height:1.15;word-break:break-word}
-.card.big .kw{font-size:23px}
+.card.sel{box-shadow:0 0 0 3px var(--blue)}
+.card .kw{font-family:"Archivo Black";font-size:18px;line-height:1.15;word-break:break-word}
 .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.badge{border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;color:#fff}
+.badge{border-radius:999px;padding:3px 9px;font-size:12px;font-weight:600;color:#fff}
 .b-Emergente{background:var(--emergente)} .b-Creciendo{background:var(--creciendo)} .b-Pico{background:var(--pico)} .b-Saturado{background:var(--saturado)}
-.cat{border-radius:999px;padding:3px 10px;font-size:12px;background:var(--blue-soft);color:var(--blue)}
+.cat{border-radius:999px;padding:3px 9px;font-size:12px;background:var(--blue-soft);color:var(--blue)}
 .plat{border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700;color:#fff}
 .p-X{background:var(--x);color:var(--paper)} .p-Google{background:var(--google)} .p-Reddit{background:var(--reddit)} .p-TikTok{background:var(--tiktok)}
+.ar{border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700;background:#75aadb;color:#fff}
 .flag{font-size:12px;color:var(--emergente);font-weight:600}
 .meta{color:var(--muted);font-size:13px}
 .score{margin-left:auto;font-family:"Space Mono";font-weight:700;color:var(--blue)}
-.spark{height:28px;width:100%}
-.detail{display:none;border-top:1px dashed var(--line);padding-top:8px;font-size:13px}
-.card.open .detail{display:block}
+.spark{height:26px;width:100%}
+.cfoot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto}
+.linkbtn{background:none;border:0;padding:0;color:var(--muted);font-size:13px;text-decoration:underline}
+.analyze{background:var(--blue);color:#fff;border:0;border-radius:999px;padding:6px 13px;font-size:13px;font-weight:600}
+.detail{border-top:1px dashed var(--line);padding-top:8px;font-size:13px}
 .detail a{color:var(--blue)}
-.detail li{margin:3px 0}
-.empty{padding:40px;text-align:center;color:var(--muted)}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-size:13px;display:none}
-@media (max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.hot{grid-template-columns:1fr}}
-@media (max-width:520px){header,main{padding:12px 16px}.title{font-size:18px}}
+.detail ul{margin:6px 0 0;padding-left:18px}
+.empty{padding:28px;text-align:center;color:var(--muted);grid-column:1/-1}
+.panel{background:var(--card);border:2px solid var(--blue);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:14px}
+.panel h3{margin:0;font-family:"Archivo Black";font-size:17px;color:var(--blue)}
+.pbox{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.pbox .kw{font-family:"Archivo Black";font-size:16px}
+.clients{display:flex;flex-wrap:wrap;gap:6px}
+.cchip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:5px 11px;font-size:13px}
+.cchip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.cchip.add{border-style:dashed;color:var(--blue)}
+.switch{display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer}
+.switch input{appearance:none;width:38px;height:22px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;flex:none;margin:0;transition:background .15s}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
+.switch input:checked{background:var(--blue)}
+.switch input:checked::after{left:19px}
+.qs{display:flex;flex-direction:column;gap:6px}
+.q{text-align:left;background:transparent;border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-size:14px}
+.q:hover{border-color:var(--blue)}
+.q.main{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}
+.q:disabled{opacity:.5;cursor:default}
+.chat{display:flex;flex-direction:column;gap:10px}
+.msg{border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.5}
+.msg.u{background:var(--blue-soft);color:var(--ink);align-self:flex-end;max-width:90%}
+.msg.a{border:1px solid var(--line)}
+.msg.a h4{margin:10px 0 4px;font-size:14px;color:var(--blue)}
+.msg.a ul{margin:4px 0;padding-left:18px}
+.msg.a p{margin:4px 0}
+.msg .src{margin-top:8px;font-size:12px;color:var(--muted)}
+.msg .src a{color:var(--blue)}
+.ask{display:flex;gap:6px}
+.ask input{flex:1;min-width:0;font:inherit;padding:9px 12px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.hint{font-size:13px;color:var(--muted)}
+.hint a{color:var(--blue)}
+.warn{font-size:13px;background:var(--blue-soft);border-radius:10px;padding:10px}
+dialog{border:0;border-radius:18px;padding:0;background:var(--card);color:var(--ink);width:min(640px,calc(100vw - 32px));max-height:calc(100vh - 40px)}
+dialog::backdrop{background:rgba(10,10,30,.55)}
+.dlg{padding:20px;display:flex;flex-direction:column;gap:12px}
+.dlg h3{margin:0;font-family:"Archivo Black";color:var(--blue)}
+.dlg label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600}
+.dlg input[type=text],.dlg input[type=password],.dlg textarea{font:inherit;font-weight:400;padding:9px 11px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.dlg textarea{min-height:90px;resize:vertical}
+.nets{display:flex;flex-wrap:wrap;gap:10px;font-weight:400}
+.nets label{flex-direction:row;align-items:center;gap:5px;font-weight:400}
+.dlg .actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.danger{color:var(--emergente);border-color:var(--emergente)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-size:13px;z-index:20}
+.loading{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.loading{animation:none}}
+@media (max-width:1250px){.layout{grid-template-columns:210px minmax(0,1fr)}.panel{grid-column:1/-1;position:static;max-height:none}}
+@media (max-width:820px){.layout{grid-template-columns:1fr;padding:12px 16px}aside.filters{position:static;max-height:none}.kpis{grid-template-columns:repeat(2,1fr)}header{padding:10px 16px}}
 </style>
 </head>
 <body>
@@ -76,151 +130,506 @@ h2{font-family:"Archivo Black";font-size:26px;margin:0 0 4px;color:var(--blue)}
   <span class="title">Radar de tendencias</span>
   <span class="spacer"></span>
   <span class="mono" id="updated">—</span>
-  <button class="ghost" id="theme" title="Cambiar tema">◐</button>
-  <button class="btn" id="refresh">Actualizar ahora</button>
+  <button class="ghost" id="settings" type="button">IA</button>
+  <button class="ghost" id="theme" type="button" aria-label="Cambiar tema">◐</button>
+  <button class="btn" id="refresh" type="button">Actualizar ahora</button>
 </header>
-<main>
-  <section class="kpis">
-    <div class="kpi"><span class="mono">Tendencias activas</span><b id="k-total">0</b></div>
-    <div class="kpi"><span class="mono">Emergentes</span><b id="k-new">0</b></div>
-    <div class="kpi"><span class="mono">Saltaron de plataforma</span><b id="k-jump">0</b></div>
-    <div class="kpi"><span class="mono">Aptas para experiencia</span><b id="k-exp">0</b></div>
-  </section>
 
-  <h2>Arrancando ahora</h2>
-  <p class="sub">Emergentes con mejor puntaje: aparecieron hace poco, suben rápido o ya se ven en más de una plataforma.</p>
-  <section class="hot" id="hot"></section>
+<div class="layout">
+  <aside class="filters" aria-label="Filtros">
+    <input type="search" id="q" placeholder="Buscar tendencia…" aria-label="Buscar tendencia">
+    <div class="fgroup" id="f-region"></div>
+    <div class="fgroup" id="f-source"></div>
+    <div class="fgroup" id="f-cat"></div>
+    <div class="fgroup" id="f-stage"></div>
+    <div class="fgroup" id="f-flags"></div>
+    <button class="clear" id="clear" type="button">Limpiar filtros</button>
+  </aside>
 
-  <h2>Todas las tendencias</h2>
-  <p class="sub">Tocá una tarjeta para ver dónde aparece y los links.</p>
-  <section class="filters">
-    <input type="search" id="q" placeholder="Buscar tendencia…">
-    <div class="group" id="f-stage"><span class="mono">Etapa</span></div>
-    <div class="group" id="f-source"><span class="mono">Fuente</span></div>
-    <div class="group" id="f-region"><span class="mono">Zona</span></div>
-    <div class="group" id="f-cat"><span class="mono">Categoría</span></div>
-    <div class="group"><button class="chip" id="f-jump">Solo las que saltaron</button><button class="chip" id="f-exp">Solo aptas para experiencia</button></div>
+  <main>
+    <section class="kpis">
+      <div class="kpi"><span class="mono">Con estos filtros</span><b id="k-total">0</b></div>
+      <div class="kpi"><span class="mono">Emergentes</span><b id="k-new">0</b></div>
+      <div class="kpi"><span class="mono">Saltaron de plataforma</span><b id="k-jump">0</b></div>
+      <div class="kpi"><span class="mono">Aptas para experiencia</span><b id="k-exp">0</b></div>
+    </section>
+    <h2>Arrancando ahora</h2>
+    <p class="sub">Las emergentes y en crecimiento con mejor puntaje, según los filtros de la izquierda.</p>
+    <section class="hot" id="hot"></section>
+    <h2>Todas las tendencias</h2>
+    <p class="sub">Tocá «Analizar» para llevar una tendencia al panel de clientes.</p>
+    <section class="grid" id="grid"></section>
+  </main>
+
+  <section class="panel" aria-label="Aplicar al cliente">
+    <h3>Aplicar al cliente</h3>
+    <div class="pbox" id="p-trend"><span class="hint">Elegí una tendencia con «Analizar».</span></div>
+    <div>
+      <div class="mono" style="color:var(--muted);margin-bottom:6px">Cliente</div>
+      <div class="clients" id="p-clients"></div>
+    </div>
+    <label class="switch"><input type="checkbox" id="enhance"> <span><b>Enhance</b> · sumar investigación en internet</span></label>
+    <div class="qs" id="p-qs"></div>
+    <div class="chat" id="p-chat"></div>
+    <form class="ask" id="p-ask">
+      <input id="p-input" placeholder="Preguntá sobre esta tendencia…" aria-label="Pregunta">
+      <button class="btn" type="submit">Enviar</button>
+    </form>
+    <div id="p-keyhint"></div>
   </section>
-  <section class="grid" id="grid"></section>
-</main>
-<div class="toast" id="toast"></div>
+</div>
+
+<dialog id="dlg-client">
+  <form class="dlg" id="client-form" method="dialog">
+    <h3 id="client-title">Cliente</h3>
+    <label>Nombre<input type="text" id="c-name" required></label>
+    <label>Rubro<input type="text" id="c-industry" placeholder="Ej: alimentos saludables"></label>
+    <label>Brief (productos, público, objetivos, todo lo que sepan)<textarea id="c-brief" rows="7"></textarea></label>
+    <label>Subir brief en archivo (PDF, TXT o MD)<input type="file" id="c-file" accept=".pdf,.txt,.md,text/plain,application/pdf"></label>
+    <div class="hint" id="c-filename"></div>
+    <label>Tono de voz<textarea id="c-tone" rows="3" placeholder="Ej: cercano, con humor, voseo, sin tecnicismos"></textarea></label>
+    <label>A dónde lo queremos llevar (posicionamiento futuro, info que no está en internet)<textarea id="c-future" rows="3"></textarea></label>
+    <div><div style="font-size:13px;font-weight:600;margin-bottom:6px">Redes que le manejamos</div><div class="nets" id="c-nets"></div></div>
+    <div class="actions">
+      <button class="ghost danger" type="button" id="c-delete">Borrar cliente</button>
+      <span class="spacer"></span>
+      <button class="ghost" type="button" id="c-cancel">Cancelar</button>
+      <button class="btn" type="submit">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="dlg-settings">
+  <form class="dlg" id="settings-form" method="dialog">
+    <h3>Configurar IA (gratis)</h3>
+    <p class="hint">La IA usa <b>Google Gemini</b>, que tiene un plan gratuito. Sacá tu clave en <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> (entrás con tu cuenta de Google, «Create API key», no pide tarjeta) y pegala acá. Queda guardada solo en este navegador.</p>
+    <label>Clave de Gemini<input type="password" id="s-key" autocomplete="off"></label>
+    <label>Modelo<input type="text" id="s-model"></label>
+    <div class="hint">Clientes: los perfiles se guardan en este navegador. Para pasárselos a otra persona, exportalos y que los importe.</div>
+    <div class="actions" style="justify-content:flex-start">
+      <button class="ghost" type="button" id="s-export">Exportar clientes</button>
+      <label class="ghost" style="flex-direction:row;font-weight:400;cursor:pointer">Importar clientes<input type="file" id="s-import" accept=".json,application/json" hidden></label>
+    </div>
+    <div class="actions">
+      <button class="ghost" type="button" id="s-cancel">Cancelar</button>
+      <button class="btn" type="submit">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" hidden></div>
 
 <script src="data.js"></script>
+<script src="clients.js"></script>
 <script>
-const STAGES = ["Emergente","Creciendo","Pico","Saturado"];
-const SOURCES = ["X","Google","Reddit","TikTok"];
-const REGIONS = {"AR":"Argentina","MUNDO":"Mundo"};
-const REGION_LABEL = {AR:"Argentina",MUNDO:"Mundo",US:"EE.UU.",GB:"Reino Unido",BR:"Brasil",MX:"México",ES:"España",EXPLICA:"OutOfTheLoop"};
-const state = {data:[], q:"", stage:new Set(), source:new Set(), region:new Set(), cat:new Set(), jump:false, exp:false};
+const STAGES=["Emergente","Creciendo","Pico","Saturado"];
+const SOURCES=["X","TikTok","Google","Reddit"];
+const NETWORKS=["Instagram","TikTok","X","YouTube","LinkedIn","Facebook","Threads","Pinterest"];
+const REGION_LABEL={AR:"Argentina",MUNDO:"Mundo",US:"EE.UU.",GB:"Reino Unido",BR:"Brasil",MX:"México",ES:"España",EXPLICA:"OutOfTheLoop"};
+const DEFAULT_MODEL="gemini-flash-latest";
+const QUESTIONS=[
+  {id:"ideas",main:true,label:"Sugerencias de contenido para cada red del cliente"},
+  {id:"what",label:"¿De qué trata? Formato, audio, emoción"},
+  {id:"people",label:"¿Cómo la usa la gente?"},
+  {id:"brands",label:"¿Cómo la usan las marcas?"},
+  {id:"why",label:"¿Por qué tiene sentido para [marca]?"},
+  {id:"join",label:"¿Cómo nos sumamos? Ideas concretas"},
+  {id:"exp",label:"Idea de experiencia presencial"},
+  {id:"comp",label:"¿Qué hace la competencia?"},
+];
 
-function el(tag, cls, text){const e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e;}
-function toast(msg){const t=document.getElementById("toast"); t.textContent=msg; t.style.display="block"; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display="none",4000);}
-function isAR(t){return t.members.some(m=>m.region==="AR");}
-function isWorld(t){return t.members.some(m=>m.region!=="AR");}
+const store={
+  get(k,def){try{const v=localStorage.getItem(k);return v==null?def:JSON.parse(v);}catch(e){return def;}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true;}catch(e){return false;}},
+};
+const state={data:[],q:"",region:new Set(["AR"]),source:new Set(),cat:new Set(),stage:new Set(),jump:false,exp:false,open:new Set(),
+  trend:null,clientId:store.get("radar.client",null),chats:{},busy:false};
+let clients=store.get("radar.clients",null)||JSON.parse(JSON.stringify(window.SEED_CLIENTS||[]));
+
+function el(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,4500);}
+const isAR=t=>t.members.some(m=>m.region==="AR");
+const isWorld=t=>t.members.some(m=>m.region!=="AR");
+const regionName=r=>REGION_LABEL[r]||r;
 
 function sparkline(ranks){
-  const pts = ranks.slice().reverse();
-  if(pts.filter(r=>r!=null).length<2) return null;
-  const ns="http://www.w3.org/2000/svg", w=100, h=28, max=50;
-  const svg=document.createElementNS(ns,"svg"); svg.setAttribute("viewBox",`0 0 ${w} ${h}`); svg.setAttribute("preserveAspectRatio","none"); svg.classList.add("spark");
-  let d="", pen=false;
-  pts.forEach((r,i)=>{ if(r==null){pen=false;return;} const x=i/(pts.length-1)*w, y=2+(Math.min(r,max)-1)/(max-1)*(h-4); d+=(pen?"L":"M")+x.toFixed(1)+" "+y.toFixed(1)+" "; pen=true; });
-  const p=document.createElementNS(ns,"path"); p.setAttribute("d",d); p.setAttribute("fill","none"); p.setAttribute("stroke","var(--blue)"); p.setAttribute("stroke-width","2"); p.setAttribute("vector-effect","non-scaling-stroke");
-  svg.appendChild(p); return svg;
+  const pts=ranks.slice().reverse();
+  if(pts.filter(r=>r!=null).length<2)return null;
+  const ns="http://www.w3.org/2000/svg",w=100,h=26,max=50;
+  const svg=document.createElementNS(ns,"svg");svg.setAttribute("viewBox",`0 0 ${w} ${h}`);svg.setAttribute("preserveAspectRatio","none");svg.classList.add("spark");
+  let d="",pen=false;
+  pts.forEach((r,i)=>{if(r==null){pen=false;return;}const x=i/(pts.length-1)*w,y=2+(Math.min(r,max)-1)/(max-1)*(h-4);d+=(pen?"L":"M")+x.toFixed(1)+" "+y.toFixed(1)+" ";pen=true;});
+  const p=document.createElementNS(ns,"path");p.setAttribute("d",d);p.setAttribute("fill","none");p.setAttribute("stroke","var(--blue)");p.setAttribute("stroke-width","2");p.setAttribute("vector-effect","non-scaling-stroke");
+  svg.append(p);return svg;
 }
+const trendId=t=>t.source+"|"+t.region+"|"+t.keyword;
 
-function card(t, big){
-  const c=el("article","card"+(big?" big":""));
-  const top=el("div","row");
-  top.append(el("span","badge b-"+t.stage,t.stage), el("span","cat",t.category), el("span","score",Math.round(t.score)));
-  c.append(top, el("div","kw",t.keyword));
+function card(t,big){
+  const c=el("article","card"+(big?" big":"")+(state.trend&&trendId(state.trend)===trendId(t)?" sel":""));
+  const top=el("div","row");top.append(el("span","badge b-"+t.stage,t.stage),el("span","cat",t.category),el("span","score",Math.round(t.score)));
+  c.append(top,el("div","kw",t.keyword));
   const plats=el("div","row");
+  if(isAR(t))plats.append(el("span","ar","AR"));
   t.platforms.forEach(p=>plats.append(el("span","plat p-"+p,p)));
-  if(t.jumped) plats.append(el("span","flag","↗ saltó de plataforma"));
-  if(t.experience_friendly) plats.append(el("span","meta","· apta para experiencia"));
+  if(t.jumped)plats.append(el("span","flag","↗ saltó de plataforma"));
   c.append(plats);
   const bits=[];
-  if(t.source==="X"){const e=t.extra; bits.push(e.is_new?"Nuevo en X esta hora":`${e.hours_in_trending}h en tendencia en X`); if(e.rank_prev_hour) bits.push(`#${e.rank_prev_hour} → #${t.rank}`);}
-  else bits.push(`#${t.rank} en ${t.source} ${REGION_LABEL[t.region]||t.region}`);
-  if(t.traffic) bits.push(t.source==="Google"?t.traffic+" búsquedas":t.traffic);
-  bits.push("En: "+t.seen_in.map(s=>{const [a,b]=s.split(" ");return a+" "+(REGION_LABEL[b]||b);}).join(", "));
+  if(t.source==="X"){const e=t.extra;bits.push(e.is_new?"Nuevo en X esta hora":`${e.hours_in_trending}h en tendencia en X`);if(e.rank_prev_hour)bits.push(`#${e.rank_prev_hour} → #${t.rank}`);}
+  else bits.push(`#${t.rank} en ${t.source} ${regionName(t.region)}`);
+  if(t.traffic)bits.push(t.source==="Google"?t.traffic+" búsquedas":t.traffic);
   c.append(el("div","meta",bits.join(" · ")));
-  if(t.source==="X" && t.extra.rank_history){const s=sparkline(t.extra.rank_history); if(s) c.append(s);}
-  const det=el("div","detail"); const ul=el("ul");
-  t.members.forEach(m=>{const li=el("li"); const a=el("a",null,`${m.source} ${REGION_LABEL[m.region]||m.region} · #${m.rank} · ${m.keyword}`); if(/^https?:\/\//.test(m.url)){a.href=m.url;a.target="_blank";a.rel="noopener";} li.append(a); ul.append(li);});
-  if(t.extra && t.extra.news) det.append(el("div","meta","Noticia: "+t.extra.news));
-  det.append(ul); c.append(det);
-  c.addEventListener("click",e=>{if(e.target.tagName!=="A") c.classList.toggle("open");});
+  if(t.source==="X"&&t.extra.rank_history){const s=sparkline(t.extra.rank_history);if(s)c.append(s);}
+  const id=trendId(t);
+  if(state.open.has(id)){
+    const det=el("div","detail");
+    det.append(el("div","meta","Aparece en: "+t.seen_in.map(s=>{const[a,b]=s.split(" ");return a+" "+regionName(b);}).join(", ")));
+    if(t.extra&&t.extra.news)det.append(el("div","meta","Noticia: "+t.extra.news));
+    const ul=el("ul");
+    t.members.forEach(m=>{const li=el("li");const a=el("a",null,`${m.source} ${regionName(m.region)} · #${m.rank} · ${m.keyword}`);if(/^https?:\/\//.test(m.url)){a.href=m.url;a.target="_blank";a.rel="noopener";}li.append(a);ul.append(li);});
+    det.append(ul);c.append(det);
+  }
+  const foot=el("div","cfoot");
+  const more=el("button","linkbtn",state.open.has(id)?"Ocultar links":"Ver links");more.type="button";
+  more.onclick=()=>{state.open.has(id)?state.open.delete(id):state.open.add(id);render();};
+  const an=el("button","analyze","Analizar →");an.type="button";
+  an.onclick=()=>selectTrend(t);
+  foot.append(more,an);c.append(foot);
   return c;
 }
 
-function passes(t){
-  if(state.q && !(t.keyword+" "+t.members.map(m=>m.keyword).join(" ")).toLowerCase().includes(state.q)) return false;
-  if(state.stage.size && !state.stage.has(t.stage)) return false;
-  if(state.source.size && !t.platforms.some(p=>state.source.has(p))) return false;
-  if(state.region.size && !((state.region.has("AR")&&isAR(t))||(state.region.has("MUNDO")&&isWorld(t)))) return false;
-  if(state.cat.size && !state.cat.has(t.category)) return false;
-  if(state.jump && !t.jumped) return false;
-  if(state.exp && !t.experience_friendly) return false;
+function passes(t,skip){
+  if(state.q&&!(t.keyword+" "+t.members.map(m=>m.keyword).join(" ")).toLowerCase().includes(state.q))return false;
+  if(skip!=="region"&&state.region.size&&!((state.region.has("AR")&&isAR(t))||(state.region.has("MUNDO")&&isWorld(t))))return false;
+  if(skip!=="source"&&state.source.size&&!t.platforms.some(p=>state.source.has(p)))return false;
+  if(skip!=="cat"&&state.cat.size&&!state.cat.has(t.category))return false;
+  if(skip!=="stage"&&state.stage.size&&!state.stage.has(t.stage))return false;
+  if(state.jump&&!t.jumped)return false;
+  if(state.exp&&!t.experience_friendly)return false;
   return true;
 }
 
+function filterGroup(id,title,key,values,test,labels){
+  const g=document.getElementById(id);g.replaceChildren(el("span","mono",title));
+  const set=state[key];const pool=state.data.filter(t=>passes(t,key));
+  values.forEach(v=>{
+    const n=pool.filter(t=>test(t,v)).length;
+    const b=el("button","fopt"+(set.has(v)?" on":""));b.type="button";
+    b.append(el("span",null,labels?labels[v]:v),el("span","n",n));
+    b.onclick=()=>{set.has(v)?set.delete(v):set.add(v);render();};
+    g.append(b);
+  });
+}
+function renderFilters(){
+  filterGroup("f-region","Zona","region",["AR","MUNDO"],(t,v)=>v==="AR"?isAR(t):isWorld(t),{AR:"Argentina",MUNDO:"Mundo"});
+  filterGroup("f-source","Plataforma","source",SOURCES,(t,v)=>t.platforms.includes(v));
+  filterGroup("f-cat","Categoría","cat",[...new Set(state.data.map(t=>t.category))].sort(),(t,v)=>t.category===v);
+  filterGroup("f-stage","Etapa","stage",STAGES,(t,v)=>t.stage===v);
+  const g=document.getElementById("f-flags");g.replaceChildren(el("span","mono","Otros"));
+  [["jump","Solo las que saltaron"],["exp","Aptas para experiencia"]].forEach(([k,label])=>{
+    const b=el("button","fopt"+(state[k]?" on":""),label);b.type="button";b.onclick=()=>{state[k]=!state[k];render();};g.append(b);
+  });
+}
+
 function render(){
-  const d=state.data;
-  document.getElementById("k-total").textContent=d.length;
-  document.getElementById("k-new").textContent=d.filter(t=>t.stage==="Emergente").length;
-  document.getElementById("k-jump").textContent=d.filter(t=>t.jumped).length;
-  document.getElementById("k-exp").textContent=d.filter(t=>t.experience_friendly).length;
-  const hot=document.getElementById("hot"); hot.replaceChildren();
-  d.filter(t=>t.stage==="Emergente"||t.stage==="Creciendo").slice(0,6).forEach(t=>hot.append(card(t,true)));
-  const grid=document.getElementById("grid"); grid.replaceChildren();
-  const list=d.filter(passes);
-  if(!list.length) grid.append(el("div","empty","No hay tendencias con esos filtros."));
-  list.forEach(t=>grid.append(card(t,false)));
+  renderFilters();
+  const list=state.data.filter(t=>passes(t));
+  document.getElementById("k-total").textContent=list.length;
+  document.getElementById("k-new").textContent=list.filter(t=>t.stage==="Emergente").length;
+  document.getElementById("k-jump").textContent=list.filter(t=>t.jumped).length;
+  document.getElementById("k-exp").textContent=list.filter(t=>t.experience_friendly).length;
+  const hotList=list.filter(t=>t.stage==="Emergente"||t.stage==="Creciendo").slice(0,6);
+  const hot=document.getElementById("hot");hot.replaceChildren();
+  if(!hotList.length)hot.append(el("div","empty","Nada emergente con estos filtros."));
+  hotList.forEach(t=>hot.append(card(t,true)));
+  const hotIds=new Set(hotList.map(trendId));
+  const grid=document.getElementById("grid");grid.replaceChildren();
+  const rest=list.filter(t=>!hotIds.has(trendId(t)));
+  if(!rest.length)grid.append(el("div","empty","No hay más tendencias con esos filtros."));
+  rest.forEach(t=>grid.append(card(t,false)));
 }
 
-function chips(id, values, set, labels){
-  const g=document.getElementById(id); g.querySelectorAll(".chip").forEach(c=>c.remove());
-  values.forEach(v=>{const b=el("button","chip"+(set.has(v)?" on":""),labels?labels[v]:v); b.onclick=()=>{set.has(v)?set.delete(v):set.add(v); b.classList.toggle("on"); render();}; g.append(b);});
+/* ---------- Panel de cliente ---------- */
+const currentClient=()=>clients.find(c=>c.id===state.clientId)||null;
+const chatKey=()=>state.trend&&state.clientId?trendId(state.trend)+"::"+state.clientId:null;
+
+function selectTrend(t){
+  state.trend=t;render();renderPanel();
+  if(window.matchMedia("(max-width:1250px)").matches)document.querySelector(".panel").scrollIntoView({behavior:"smooth"});
 }
 
+function renderPanel(){
+  const box=document.getElementById("p-trend");box.replaceChildren();
+  if(state.trend){
+    const t=state.trend;
+    box.append(el("span","mono","Analizando"),el("div","kw",t.keyword));
+    const r=el("div","row");r.append(el("span","badge b-"+t.stage,t.stage),el("span","cat",t.category));t.platforms.forEach(p=>r.append(el("span","plat p-"+p,p)));
+    box.append(r,el("div","meta","En: "+t.seen_in.map(s=>{const[a,b]=s.split(" ");return a+" "+regionName(b);}).join(", ")));
+  } else box.append(el("span","hint","Elegí una tendencia con «Analizar»."));
+
+  const cl=document.getElementById("p-clients");cl.replaceChildren();
+  clients.forEach(c=>{
+    const b=el("button","cchip"+(c.id===state.clientId?" on":""),c.name);b.type="button";
+    b.onclick=()=>{state.clientId=c.id;store.set("radar.client",c.id);renderPanel();};
+    b.ondblclick=()=>openClient(c);
+    cl.append(b);
+  });
+  const add=el("button","cchip add","+ Nuevo");add.type="button";add.onclick=()=>openClient(null);cl.append(add);
+  const cur=currentClient();
+  if(cur){const ed=el("button","cchip add","Editar "+cur.name);ed.type="button";ed.onclick=()=>openClient(cur);cl.append(ed);}
+
+  const brand=cur?cur.name:"la marca";
+  const qs=document.getElementById("p-qs");qs.replaceChildren();
+  const ready=!!(state.trend&&cur)&&!state.busy;
+  QUESTIONS.forEach(q=>{
+    const b=el("button","q"+(q.main?" main":""),q.label.replace("[marca]",brand));b.type="button";b.disabled=!ready;
+    b.onclick=()=>ask(q.label.replace("[marca]",brand),q.id);qs.append(b);
+  });
+
+  const chat=document.getElementById("p-chat");chat.replaceChildren();
+  (state.chats[chatKey()]||[]).forEach(m=>chat.append(renderMsg(m)));
+  if(state.busy){const w=el("div","msg a");w.append(el("span","loading"),document.createTextNode(" Pensando…"));chat.append(w);}
+
+  const hint=document.getElementById("p-keyhint");hint.replaceChildren();
+  if(!store.get("radar.key","")){
+    const d=el("div","warn");d.append(document.createTextNode("Para usar la IA, cargá tu clave gratis de Gemini en "));
+    const b=el("button","linkbtn","Configurar IA");b.type="button";b.style.color="var(--blue)";b.onclick=openSettings;d.append(b);hint.append(d);
+  } else if(!state.trend||!cur){
+    hint.append(el("div","hint",!state.trend?"Elegí una tendencia.":"Elegí un cliente (doble clic para editarlo)."));
+  }
+  document.querySelector("#p-ask button").disabled=!ready;
+}
+
+function renderMsg(m){
+  const d=el("div","msg "+(m.role==="user"?"u":"a"));
+  if(m.role==="user"){d.textContent=m.display||m.text;return d;}
+  mdInto(d,m.text);
+  if(m.sources&&m.sources.length){
+    const s=el("div","src","Fuentes: ");
+    m.sources.slice(0,6).forEach((src,i)=>{if(i)s.append(document.createTextNode(" · "));const a=el("a",null,src.title||"link");a.href=src.uri;a.target="_blank";a.rel="noopener";s.append(a);});
+    d.append(s);
+  }
+  return d;
+}
+
+function inline(parent,text){
+  text.split(/(\*\*[^*]+\*\*)/g).forEach(part=>{
+    if(/^\*\*[^*]+\*\*$/.test(part))parent.append(el("strong",null,part.slice(2,-2)));
+    else if(part)parent.append(document.createTextNode(part.replace(/\*(\S[^*]*)\*/g,"$1")));
+  });
+}
+function mdInto(root,md){
+  let list=null;
+  md.split("\n").forEach(raw=>{
+    const line=raw.trimEnd();
+    const h=line.match(/^#{1,4}\s+(.*)/);const li=line.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)/);
+    if(h){list=null;const e=el("h4");inline(e,h[1]);root.append(e);}
+    else if(li){if(!list){list=el("ul");root.append(list);}const e=el("li");inline(e,li[1]);list.append(e);}
+    else if(line.trim()){list=null;const e=el("p");inline(e,line);root.append(e);}
+    else list=null;
+  });
+}
+
+function systemPrompt(client,trend,enhance){
+  const members=trend.members.map(m=>`- ${m.source} ${regionName(m.region)} · puesto #${m.rank} · "${m.keyword}"${m.traffic?" · "+m.traffic:""}`).join("\n");
+  const extra=[];
+  if(trend.source==="X")extra.push(`En X lleva ${trend.extra.hours_in_trending}h en tendencia (puesto anterior: ${trend.extra.rank_prev_hour||"—"}).`);
+  if(trend.extra&&trend.extra.news)extra.push("Noticia asociada: "+trend.extra.news);
+  return `Sos estratega creativa de SAROGIRI, una agencia de Buenos Aires que crea contenido, comunidad y experiencias presenciales para marcas. Respondés en español rioplatense (voseo), concreto y accionable, sin relleno. Usá títulos cortos y viñetas.
+
+TENDENCIA
+"${trend.keyword}" — etapa ${trend.stage}, categoría ${trend.category}.
+Detectada en:
+${members}
+${extra.join("\n")}
+
+CLIENTE: ${client.name}
+Rubro: ${client.industry||"(sin cargar)"}
+Brief:
+${client.brief||"(sin brief cargado)"}
+Tono de voz: ${client.tone||"(sin definir: proponé uno coherente con el brief)"}
+Posicionamiento futuro / info interna: ${client.future||"(sin cargar)"}
+Redes que le manejamos: ${(client.networks||[]).join(", ")||"(sin definir)"}
+
+REGLAS
+- La información del brief, del tono y del posicionamiento futuro que cargó la agencia es la verdad y tiene prioridad sobre cualquier cosa que encuentres en internet, que puede estar desactualizada.
+- ${enhance?"Podés buscar en Google para entender la tendencia, cómo la están usando marcas y competidores, y el mercado del cliente. Citá lo que encontrás y marcá qué viene de internet.":"No tenés búsqueda en internet: trabajá con lo que sabés y con el brief. Si no conocés bien la tendencia, decilo y explicá qué suponés."}
+- Si la tendencia no le sirve a la marca o es riesgosa (tragedia, política, polémica), decilo claramente antes de proponer nada.
+- Cuando propongas contenido, respetá el tono de voz y proponé solo para las redes que le manejamos.`;
+}
+
+const PROMPTS={
+  ideas:c=>`Dame sugerencias de contenido para subirse a esta tendencia, separadas por cada red que le manejamos a ${c.name} (${(c.networks||[]).join(", ")||"elegí las más adecuadas"}). Para cada red: formato, idea, hook de los primeros segundos o primera línea, copy de ejemplo en el tono de voz de la marca, y cuándo publicarlo (la ventana de la tendencia). Cerrá con cuál harías primero y por qué.`,
+  exp:c=>`Proponé 2 ideas de experiencia presencial o activación de comunidad para ${c.name} basadas en esta tendencia: concepto, formato, lugar, cantidad de gente, qué contenido sale de ahí y en qué plazo habría que hacerla.`,
+};
+
+async function pickFlashModel(key){
+  try{
+    const r=await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200",{headers:{"x-goog-api-key":key}});
+    const names=((await r.json()).models||[])
+      .filter(m=>(m.supportedGenerationMethods||[]).includes("generateContent"))
+      .map(m=>m.name.replace("models/",""))
+      .filter(n=>/flash/.test(n)&&!/image|live|tts|audio|lite|preview|exp/.test(n));
+    const ver=n=>parseFloat((n.match(/gemini-(\d+(?:\.\d+)?)/)||[0,0])[1]);
+    names.sort((a,b)=>ver(b)-ver(a));
+    return names.includes("gemini-flash-latest")?"gemini-flash-latest":names[0]||null;
+  }catch(e){return null;}
+}
+
+async function ask(text,qid){
+  const client=currentClient(),trend=state.trend,key=store.get("radar.key","");
+  if(!client||!trend)return;
+  if(!key){openSettings();return;}
+  const k=chatKey();const hist=state.chats[k]||(state.chats[k]=[]);
+  const prompt=(qid&&PROMPTS[qid])?PROMPTS[qid](client):text;
+  hist.push({role:"user",text:prompt,display:text});
+  state.busy=true;renderPanel();
+  const enhance=document.getElementById("enhance").checked;
+  try{
+    const contents=hist.map((m,i)=>{
+      const parts=[{text:m.text}];
+      if(i===0&&client.file&&client.file.mime==="application/pdf")parts.unshift({inline_data:{mime_type:"application/pdf",data:client.file.data}});
+      return {role:m.role==="user"?"user":"model",parts};
+    });
+    const body={system_instruction:{parts:[{text:systemPrompt(client,trend,enhance)}]},contents};
+    if(enhance)body.tools=[{google_search:{}}];
+    const call=m=>fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m)}:generateContent`,{
+      method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},body:JSON.stringify(body)});
+    let r=await call(store.get("radar.model",DEFAULT_MODEL)||DEFAULT_MODEL);
+    if(r.status===404){
+      const picked=await pickFlashModel(key);
+      if(picked){store.set("radar.model",picked);r=await call(picked);}
+    }
+    const j=await r.json();
+    if(!r.ok){
+      const msg=(j.error&&j.error.message)||r.statusText;
+      throw new Error(r.status===429?"Se alcanzó el límite gratuito de Gemini por ahora. Probá en un rato.":r.status===400&&/API key/i.test(msg)?"La clave de Gemini no es válida. Revisala en «IA».":msg);
+    }
+    const cand=(j.candidates||[])[0];
+    const out=cand&&cand.content&&cand.content.parts?cand.content.parts.map(p=>p.text||"").join(""):"";
+    const sources=((cand&&cand.groundingMetadata&&cand.groundingMetadata.groundingChunks)||[]).map(c=>c.web).filter(Boolean);
+    hist.push({role:"model",text:out||"No hubo respuesta. Probá reformular la pregunta.",sources});
+  }catch(e){
+    hist.pop();toast(e.message||"No se pudo consultar a Gemini");
+  }
+  state.busy=false;renderPanel();
+  const chat=document.getElementById("p-chat");chat.lastElementChild&&chat.lastElementChild.scrollIntoView({block:"nearest",behavior:"smooth"});
+}
+document.getElementById("p-ask").onsubmit=e=>{e.preventDefault();const i=document.getElementById("p-input");const v=i.value.trim();if(!v)return;i.value="";ask(v);};
+
+/* ---------- Clientes ---------- */
+let editing=null,pendingFile=undefined;
+const nets=document.getElementById("c-nets");
+NETWORKS.forEach(n=>{const l=el("label");const c=el("input");c.type="checkbox";c.value=n;c.id="net-"+n;l.append(c,document.createTextNode(n));nets.append(l);});
+function openClient(c){
+  editing=c;pendingFile=undefined;
+  document.getElementById("client-title").textContent=c?"Editar "+c.name:"Nuevo cliente";
+  document.getElementById("c-name").value=c?c.name:"";
+  document.getElementById("c-industry").value=c?c.industry||"":"";
+  document.getElementById("c-brief").value=c?c.brief||"":"";
+  document.getElementById("c-tone").value=c?c.tone||"":"";
+  document.getElementById("c-future").value=c?c.future||"":"";
+  document.getElementById("c-file").value="";
+  document.getElementById("c-filename").textContent=c&&c.file?"Archivo cargado: "+c.file.name:"";
+  nets.querySelectorAll("input").forEach(i=>i.checked=!!(c&&(c.networks||[]).includes(i.value)));
+  document.getElementById("c-delete").hidden=!c;
+  document.getElementById("dlg-client").showModal();
+}
+document.getElementById("c-file").onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  if(f.size>3.5*1024*1024){toast("El archivo es muy grande (máx. 3,5 MB). Pegá el texto en el brief.");e.target.value="";return;}
+  if(f.type==="application/pdf"||/\.pdf$/i.test(f.name)){
+    const buf=new Uint8Array(await f.arrayBuffer());let bin="";for(let i=0;i<buf.length;i+=0x8000)bin+=String.fromCharCode.apply(null,buf.subarray(i,i+0x8000));
+    pendingFile={name:f.name,mime:"application/pdf",data:btoa(bin)};
+    document.getElementById("c-filename").textContent="PDF listo: "+f.name+". La IA lo lee completo.";
+  } else {
+    const txt=await f.text();const b=document.getElementById("c-brief");
+    b.value=(b.value?b.value+"\n\n":"")+txt;pendingFile=undefined;
+    document.getElementById("c-filename").textContent="Texto de "+f.name+" agregado al brief.";
+  }
+};
+document.getElementById("client-form").onsubmit=e=>{
+  e.preventDefault();
+  const name=document.getElementById("c-name").value.trim();if(!name)return;
+  const data={name,industry:document.getElementById("c-industry").value.trim(),brief:document.getElementById("c-brief").value.trim(),
+    tone:document.getElementById("c-tone").value.trim(),future:document.getElementById("c-future").value.trim(),
+    networks:[...nets.querySelectorAll("input:checked")].map(i=>i.value)};
+  if(editing){Object.assign(editing,data);if(pendingFile)editing.file=pendingFile;}
+  else{const c={id:"c"+Date.now().toString(36),...data};if(pendingFile)c.file=pendingFile;clients.push(c);state.clientId=c.id;store.set("radar.client",c.id);}
+  if(!store.set("radar.clients",clients))toast("No se pudo guardar: el navegador no tiene espacio (¿PDF muy grande?).");
+  else toast("Cliente guardado");
+  Object.keys(state.chats).forEach(k=>{if(k.endsWith("::"+(editing?editing.id:"")))delete state.chats[k];});
+  document.getElementById("dlg-client").close();renderPanel();
+};
+document.getElementById("c-cancel").onclick=()=>document.getElementById("dlg-client").close();
+let confirmDelete=false;
+document.getElementById("c-delete").onclick=e=>{
+  if(!editing)return;
+  if(!confirmDelete){confirmDelete=true;e.currentTarget.textContent="Tocá de nuevo para borrar";setTimeout(()=>{confirmDelete=false;e.target.textContent="Borrar cliente";},3000);return;}
+  confirmDelete=false;e.currentTarget.textContent="Borrar cliente";
+  clients=clients.filter(c=>c!==editing);if(state.clientId===editing.id)state.clientId=null;
+  store.set("radar.clients",clients);document.getElementById("dlg-client").close();renderPanel();toast("Cliente borrado");
+};
+
+/* ---------- Configuración ---------- */
+function openSettings(){
+  document.getElementById("s-key").value=store.get("radar.key","");
+  document.getElementById("s-model").value=store.get("radar.model",DEFAULT_MODEL);
+  document.getElementById("dlg-settings").showModal();
+}
+document.getElementById("settings").onclick=openSettings;
+document.getElementById("s-cancel").onclick=()=>document.getElementById("dlg-settings").close();
+document.getElementById("settings-form").onsubmit=e=>{
+  e.preventDefault();
+  store.set("radar.key",document.getElementById("s-key").value.trim());
+  store.set("radar.model",document.getElementById("s-model").value.trim()||DEFAULT_MODEL);
+  document.getElementById("dlg-settings").close();renderPanel();toast("Configuración guardada");
+};
+document.getElementById("s-export").onclick=async()=>{
+  const txt=JSON.stringify(clients.map(({file,...c})=>c),null,2);
+  try{await navigator.clipboard.writeText(txt);toast("Clientes copiados. Pegalos en un mensaje o archivo para compartirlos.");}
+  catch(err){const b=new Blob([txt],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="clientes-radar.json";a.click();}
+};
+document.getElementById("s-import").onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{const arr=JSON.parse(await f.text());if(!Array.isArray(arr))throw 0;
+    arr.forEach(c=>{if(!c||!c.name)return;const i=clients.findIndex(x=>x.id===c.id);if(i>=0)clients[i]={...clients[i],...c};else clients.push({id:c.id||"c"+Math.random().toString(36).slice(2),...c});});
+    store.set("radar.clients",clients);renderPanel();toast("Clientes importados");
+  }catch(err){toast("Ese archivo no tiene clientes válidos");}
+  e.target.value="";
+};
+
+/* ---------- Datos ---------- */
 function load(payload){
   state.data=payload.trends||[];
-  const u=payload.updated_at; document.getElementById("updated").textContent=u?"Actualizado "+new Date(u).toLocaleString("es-AR",{dateStyle:"short",timeStyle:"short"}):"Sin datos todavía";
-  chips("f-stage",STAGES,state.stage); chips("f-source",SOURCES,state.source); chips("f-region",Object.keys(REGIONS),state.region,REGIONS);
-  chips("f-cat",[...new Set(state.data.map(t=>t.category))].sort(),state.cat);
-  render();
+  const u=payload.updated_at;
+  document.getElementById("updated").textContent=u?"Actualizado "+new Date(u).toLocaleString("es-AR",{dateStyle:"short",timeStyle:"short"}):"Sin datos todavía";
+  if(state.trend){const same=state.data.find(t=>trendId(t)===trendId(state.trend));if(same)state.trend=same;}
+  render();renderPanel();
 }
-
-const OFFLINE = location.protocol === "file:";
-const LOCAL_SERVER = ["127.0.0.1","localhost"].includes(location.hostname);
-const WEB = !OFFLINE && !LOCAL_SERVER;
+const OFFLINE=location.protocol==="file:";
+const LOCAL_SERVER=["127.0.0.1","localhost"].includes(location.hostname);
+const WEB=!OFFLINE&&!LOCAL_SERVER;
 async function fetchTrends(){
-  if(OFFLINE){ load(window.RADAR_DATA || {trends:[]}); return; }
+  if(OFFLINE){load(window.RADAR_DATA||{trends:[]});return;}
   if(WEB){
-    try{ const t=await (await fetch("data.js?t="+Date.now(),{cache:"no-store"})).text(); load(JSON.parse(t.slice(t.indexOf("{"), t.lastIndexOf("}")+1))); }
-    catch(e){ load(window.RADAR_DATA || {trends:[]}); }
+    try{const t=await(await fetch("data.js?t="+Date.now(),{cache:"no-store"})).text();load(JSON.parse(t.slice(t.indexOf("{"),t.lastIndexOf("}")+1)));}
+    catch(e){load(window.RADAR_DATA||{trends:[]});}
     return;
   }
-  try{ load(await (await fetch("/api/trends")).json()); }catch(e){ load(window.RADAR_DATA || {trends:[]}); }
+  try{load(await(await fetch("/api/trends")).json());}catch(e){load(window.RADAR_DATA||{trends:[]});}
 }
-if(!LOCAL_SERVER){
-  const b=document.getElementById("refresh");
-  b.textContent = OFFLINE ? "Para actualizar: abrí «Abrir Radar.bat»" : "Se actualiza sola cada hora";
-  b.disabled=true; b.style.cursor="default";
-}
-
-document.getElementById("refresh").onclick=async e=>{
-  const b=e.currentTarget; b.disabled=true; b.textContent="Buscando tendencias…";
-  try{ const r=await fetch("/api/refresh",{method:"POST"}); const j=await r.json();
-    if(!r.ok) toast(j.error||"Error al actualizar"); else { load(j); const f=Object.keys(j.failures||{}); toast(f.length?"Actualizado. Fallaron: "+f.join(", "):"Actualizado"); } }
-  catch(err){ toast("No se pudo conectar con el servidor"); }
-  b.disabled=false; b.textContent="Actualizar ahora";
+const refreshBtn=document.getElementById("refresh");
+if(!LOCAL_SERVER){refreshBtn.textContent=OFFLINE?"Para actualizar: abrí «Abrir Radar.bat»":"Se actualiza sola cada hora";refreshBtn.disabled=true;}
+refreshBtn.onclick=async()=>{
+  refreshBtn.disabled=true;refreshBtn.textContent="Buscando tendencias…";
+  try{const r=await fetch("/api/refresh",{method:"POST"});const j=await r.json();
+    if(!r.ok)toast(j.error||"Error al actualizar");else{load(j);const f=Object.keys(j.failures||{});toast(f.length?"Actualizado. Fallaron: "+f.join(", "):"Actualizado");}}
+  catch(err){toast("No se pudo conectar con el servidor");}
+  refreshBtn.disabled=false;refreshBtn.textContent="Actualizar ahora";
 };
-document.getElementById("q").oninput=e=>{state.q=e.target.value.trim().toLowerCase(); render();};
-document.getElementById("f-jump").onclick=e=>{state.jump=!state.jump; e.currentTarget.classList.toggle("on"); render();};
-document.getElementById("f-exp").onclick=e=>{state.exp=!state.exp; e.currentTarget.classList.toggle("on"); render();};
-document.getElementById("theme").onclick=()=>{const r=document.documentElement; const dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches; r.dataset.theme=dark?"light":"dark";};
+document.getElementById("q").oninput=e=>{state.q=e.target.value.trim().toLowerCase();render();};
+document.getElementById("clear").onclick=()=>{["region","source","cat","stage"].forEach(k=>state[k].clear());state.jump=state.exp=false;state.q="";document.getElementById("q").value="";render();};
+document.getElementById("theme").onclick=()=>{const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;r.dataset.theme=dark?"light":"dark";};
 fetchTrends();
 setInterval(fetchTrends,60000);
 </script>

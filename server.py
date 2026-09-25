@@ -30,9 +30,9 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path in ("/", "/index.html", "/dashboard.html"):
             self._send(200, (ROOT / "dashboard.html").read_bytes(), "text/html; charset=utf-8")
-        elif self.path == "/data.js":
-            data = ROOT / "data.js"
-            self._send(200, data.read_bytes() if data.exists() else b"", "application/javascript; charset=utf-8")
+        elif self.path.split("?")[0] in ("/data.js", "/clients.js"):
+            f = ROOT / self.path.split("?")[0].lstrip("/")
+            self._send(200, f.read_bytes() if f.exists() else b"", "application/javascript; charset=utf-8")
         elif self.path == "/api/trends":
             self._json(analyze())
         else:

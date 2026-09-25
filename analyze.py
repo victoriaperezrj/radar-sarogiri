@@ -153,6 +153,14 @@ def cluster(trends):
         lead["category"] = max(set(cats), key=cats.count) if cats else "Otros"
         lead["experience_friendly"] = lead["category"] in EXPERIENCE_FRIENDLY
         lead["score"] = members[0]["score"] + 4 * (len(members) - 1)
+        # Sarogiri: ~95% of what they use is Argentina + X; foreign politics is noise for them.
+        in_ar = any(m["region"] == "AR" for m in members)
+        if in_ar:
+            lead["score"] += 30
+        if "X" in lead["platforms"]:
+            lead["score"] += 15
+        if lead["category"] == "Noticias y Política" and not in_ar:
+            lead["score"] -= 40
         cards.append(lead)
     return cards
 
