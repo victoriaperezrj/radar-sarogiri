@@ -1,0 +1,191 @@
+import json
+import re
+import sqlite3
+import unicodedata
+from datetime import datetime, timezone
+from pathlib import Path
+
+DB = Path(__file__).with_name("radar.db")
+
+CATEGORIES = {
+    "Deportes": r"\bvs\b|futbol|gran premio|\bf1\b|\bnba\b|\bnfl\b|packers|boca|river|copa|liga|partido|\bgol\b|tenis|\bufc\b|messi|colapinto|seleccion|mundial|rugby|nrl|cbf|amistoso|referee|\bge\b|getv|rublev|andreeva|o'connell|alford",
+    "Música y Entretenimiento": r"taylor|concierto|album|tour|serie|pelicula|netflix|popstars|festival|oscar|grammy|kpop|\bshow\b|estreno|globo ?play|promesa|stream|配信|spotify|cantante|actor|actriz|rollers|callard|oceans calling|reality",
+    "IA y Tech": r"\bai\b|\bia\b|chatgpt|\bgpt|openai|gemini|claude|iphone|apple|android|\bapp\b|prompt|robot|tesla|steam|superintelligence|data center|nvidia|tiktok|instagram|whatsapp|gaming|\bgame|playstation|xbox",
+    "Belleza y Moda": r"makeup|maquillaje|skincare|\bpelo\b|\bhair|moda|fashion|outfit|blumarine|ss2\d|\blook|desfile|perfume|kerastase|beauty|belleza|nails|unas|zapatillas|sneaker",
+    "Comida y Bebida": r"receta|comida|food|\bcafe|burger|pizza|chicken|チキン|vino|cerveza|restaurante|mcdonald|starbucks|mate|asado|palte|plate|cocina|chef|helado|dulce",
+    "Bienestar y Fitness": r"running|\brun\b|gym|yoga|salud|wellness|caminar|maraton|dieta|sleep|meditacion|fitness|entrenamiento|pasito|cold plunge|longevity",
+    "Noticias y Política": r"israel|trump|milei|gobierno|elecciones|crisis|estafa|\bley\b|guerra|presidente|congreso|migratori|dolar|clima|beca|trabajador|prince william|sancho|melilla|lotofacil|juicio|policia",
+}
+TIKTOK_INDUSTRY = {
+    "Food & Beverage": "Comida y Bebida",
+    "Apparel & Accessories": "Belleza y Moda",
+    "Beauty & Personal Care": "Belleza y Moda",
+    "News & Entertainment": "Música y Entretenimiento",
+    "Sports & Outdoor": "Deportes",
+    "Games": "IA y Tech",
+    "Tech & Electronics": "IA y Tech",
+    "Education": "Cultura y Memes",
+    "Pets": "Cultura y Memes",
+    "Travel": "Cultura y Memes",
+    "Life": "Bienestar y Fitness",
+}
+EXPERIENCE_FRIENDLY = {"Belleza y Moda", "Comida y Bebida", "Bienestar y Fitness", "IA y Tech", "Música y Entretenimiento", "Cultura y Memes"}
+
+
+def norm(s):
+    s = unicodedata.normalize("NFKD", s.lower()).encode("ascii", "ignore").decode() or s.lower()
+    return re.sub(r"[^a-z0-9぀-鿿]+", "", s)
+
+
+def categorize(text):
+    t = unicodedata.normalize("NFKD", text.lower()).encode("ascii", "ignore").decode() + " " + text.lower()
+    for cat, pattern in CATEGORIES.items():
+        if re.search(pattern, t):
+            return cat
+    if text.startswith("#") or "what is going on" in t or "what's going on" in t:
+        return "Cultura y Memes"
+    return "Otros"
+
+
+def stage_for(t):
+    if t["source"] == "X":
+        h = t["extra"].get("hours_in_trending", 0)
+        if h <= 2:
+            return "Emergente"
+        if h <= 6:
+            return "Creciendo"
+        if h <= 14:
+            return "Pico"
+        return "Saturado"
+    if t["source"] == "Reddit":
+        return "Emergente"
+    if t["source"] == "TikTok":
+        views = t["extra"].get("views", "")
+        mult = {"K": 1e3, "M": 1e6, "B": 1e9}.get(views[-1:], 1)
+        n = float(re.sub(r"[^\d.]", "", views) or 0) * mult
+        if t["first_seen_hours"] <= 6 and n < 50e6:
+            return "Emergente"
+        return "Pico" if n >= 100e6 else "Creciendo"
+    traffic = int(re.sub(r"\D", "", t["traffic"] or "0") or 0)
+    if t["first_seen_hours"] <= 3 and traffic < 10000:
+        return "Emergente"
+    if traffic >= 10000:
+        return "Pico"
+    return "Creciendo"
+
+
+def load_latest(conn):
+    rows = conn.execute(
+        """SELECT s.source, s.region, s.keyword, s.rank, s.traffic, s.url, s.extra, s.fetched_at,
+                  (SELECT MIN(fetched_at) FROM snapshots f
+                    WHERE f.keyword = s.keyword AND f.source = s.source AND f.region = s.region) AS first_seen
+           FROM snapshots s
+           JOIN (SELECT source, region, MAX(fetched_at) AS m FROM snapshots GROUP BY source, region) l
+             ON s.source = l.source AND s.region = l.region AND s.fetched_at = l.m"""
+    ).fetchall()
+    now = datetime.now(timezone.utc)
+    out = []
+    for source, region, kw, rank, traffic, url, extra, fetched, first_seen in rows:
+        out.append({
+            "source": source, "region": region, "keyword": kw, "rank": rank,
+            "traffic": traffic or "", "url": url or "", "extra": json.loads(extra or "{}"),
+            "fetched_at": fetched,
+            "first_seen_hours": round((now - datetime.fromisoformat(first_seen)).total_seconds() / 3600, 1),
+        })
+    return out
+
+
+def cross_platform(trends):
+    keys = [(norm(t["keyword"]), t) for t in trends]
+    for k, t in keys:
+        if len(k) < 4:
+            t["seen_in"] = [f"{t['source']} {t['region']}"]
+            continue
+        hits = {f"{o['source']} {o['region']}" for k2, o in keys
+                if len(k2) >= 4 and (k in k2 or k2 in k)}
+        t["seen_in"] = sorted(hits)
+
+
+def score(t):
+    s = max(0, 60 - t["rank"])
+    s += {"Emergente": 35, "Creciendo": 20, "Pico": 8, "Saturado": 0}[t["stage"]]
+    platforms = {p.split()[0] for p in t["seen_in"]}
+    s += 25 * (len(platforms) - 1) + 5 * (len(t["seen_in"]) - 1)
+    prev = t["extra"].get("rank_prev_hour")
+    if t["source"] == "X" and prev and prev > t["rank"]:
+        s += min(20, (prev - t["rank"]) * 2)
+    if t["category"] in EXPERIENCE_FRIENDLY:
+        s += 10
+    return s
+
+
+def cluster(trends):
+    """Merge items that name the same trend across sources/regions into one card."""
+    keys = [norm(t["keyword"]) for t in trends]
+    parent = list(range(len(trends)))
+
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    for i, a in enumerate(keys):
+        for j in range(i + 1, len(keys)):
+            b = keys[j]
+            if len(a) >= 4 and len(b) >= 4 and (a in b or b in a):
+                parent[find(i)] = find(j)
+    groups = {}
+    for i, t in enumerate(trends):
+        groups.setdefault(find(i), []).append(t)
+    cards = []
+    for members in groups.values():
+        members.sort(key=lambda t: -t["score"])
+        lead = dict(members[0])
+        lead["members"] = [
+            {k: m[k] for k in ("source", "region", "keyword", "rank", "traffic", "url", "stage")}
+            for m in members
+        ]
+        lead["seen_in"] = sorted({f"{m['source']} {m['region']}" for m in members})
+        lead["platforms"] = sorted({m["source"] for m in members})
+        lead["jumped"] = len(lead["platforms"]) > 1
+        cats = [m["category"] for m in members if m["category"] != "Otros"]
+        lead["category"] = max(set(cats), key=cats.count) if cats else "Otros"
+        lead["experience_friendly"] = lead["category"] in EXPERIENCE_FRIENDLY
+        lead["score"] = members[0]["score"] + 4 * (len(members) - 1)
+        cards.append(lead)
+    return cards
+
+
+def analyze():
+    if not DB.exists():
+        return {"updated_at": None, "trends": []}
+    conn = sqlite3.connect(DB)
+    trends = load_latest(conn)
+    conn.close()
+    for t in trends:
+        t["category"] = categorize(t["keyword"] + " " + t["extra"].get("news", ""))
+        if t["category"] in ("Otros", "Cultura y Memes") and t["extra"].get("industry") in TIKTOK_INDUSTRY:
+            t["category"] = TIKTOK_INDUSTRY[t["extra"]["industry"]]
+        t["stage"] = stage_for(t)
+    cross_platform(trends)
+    for t in trends:
+        t["jumped"] = len({p.split()[0] for p in t["seen_in"]}) > 1
+        t["experience_friendly"] = t["category"] in EXPERIENCE_FRIENDLY
+        t["score"] = score(t)
+    cards = cluster(trends)
+    cards.sort(key=lambda t: -t["score"])
+    return {"updated_at": max((t["fetched_at"] for t in trends), default=None), "trends": cards}
+
+
+def export_static(path=Path(__file__).with_name("data.js")):
+    """Lets dashboard.html work when opened directly from disk, without the server."""
+    payload = json.dumps(analyze(), ensure_ascii=True).replace("</", "<\\/")
+    path.write_text(f"window.RADAR_DATA = {payload};\n", encoding="utf-8")
+
+
+if __name__ == "__main__":
+    import sys
+    sys.stdout.reconfigure(encoding="utf-8")
+    for t in analyze()["trends"][:25]:
+        print(f"{t['score']:>4} {t['stage']:<10} {t['category']:<24} {t['source']} {t['region']:<7} {t['keyword'][:60]}  {t['seen_in'] if t['jumped'] else ''}")

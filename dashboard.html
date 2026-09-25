@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar Sarogiri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1f1bf2; --blue-soft:#e8e7ff; --paper:#f5f2ea; --card:#fffdf8; --ink:#141414; --muted:#6b675f; --line:#dcd6c8;
+  --emergente:#ff4d2e; --creciendo:#f5a300; --pico:#1f1bf2; --saturado:#9a958b;
+  --x:#141414; --google:#1a73e8; --reddit:#ff4500; --tiktok:#ee1d52;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --blue:#7c78ff; --blue-soft:#1d1b4a; --paper:#111114; --card:#1a1a1f; --ink:#f1efe9; --muted:#9a968d; --line:#2c2c33;
+  --x:#f1efe9; --saturado:#6f6b64; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --blue:#7c78ff; --blue-soft:#1d1b4a; --paper:#111114; --card:#1a1a1f; --ink:#f1efe9; --muted:#9a968d; --line:#2c2c33;
+  --x:#f1efe9; --saturado:#6f6b64; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Archivo,system-ui,sans-serif;font-size:15px}
+.mono{font-family:"Space Mono",monospace;letter-spacing:.08em;text-transform:uppercase;font-size:11px}
+header{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:2px solid var(--blue);padding:14px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{background:var(--blue);color:#fff;font-family:"Archivo Black";font-size:20px;padding:6px 14px;border-radius:999px;letter-spacing:-.02em}
+.title{font-family:"Archivo Black";font-size:22px;color:var(--blue)}
+.spacer{flex:1}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:999px;padding:10px 18px}
+.btn:disabled{opacity:.5;cursor:wait}
+.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:8px 12px}
+main{max-width:1320px;margin:0 auto;padding:24px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.kpi b{display:block;font-family:"Archivo Black";font-size:34px;color:var(--blue);margin-top:6px}
+h2{font-family:"Archivo Black";font-size:26px;margin:0 0 4px;color:var(--blue)}
+.sub{color:var(--muted);margin:0 0 16px}
+.hot{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:16px}
+.filters input[type=search]{flex:1 1 220px;min-width:0;font:inherit;padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.chip{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.group{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.group .mono{color:var(--muted);margin-right:2px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px;cursor:pointer;transition:transform .12s,border-color .12s}
+.card:hover{transform:translateY(-2px);border-color:var(--blue)}
+.card.big{border:2px solid var(--blue)}
+.card .kw{font-family:"Archivo Black";font-size:19px;line-height:1.15;word-break:break-word}
+.card.big .kw{font-size:23px}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.badge{border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;color:#fff}
+.b-Emergente{background:var(--emergente)} .b-Creciendo{background:var(--creciendo)} .b-Pico{background:var(--pico)} .b-Saturado{background:var(--saturado)}
+.cat{border-radius:999px;padding:3px 10px;font-size:12px;background:var(--blue-soft);color:var(--blue)}
+.plat{border-radius:6px;padding:2px 7px;font-size:11px;font-weight:700;color:#fff}
+.p-X{background:var(--x);color:var(--paper)} .p-Google{background:var(--google)} .p-Reddit{background:var(--reddit)} .p-TikTok{background:var(--tiktok)}
+.flag{font-size:12px;color:var(--emergente);font-weight:600}
+.meta{color:var(--muted);font-size:13px}
+.score{margin-left:auto;font-family:"Space Mono";font-weight:700;color:var(--blue)}
+.spark{height:28px;width:100%}
+.detail{display:none;border-top:1px dashed var(--line);padding-top:8px;font-size:13px}
+.card.open .detail{display:block}
+.detail a{color:var(--blue)}
+.detail li{margin:3px 0}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-size:13px;display:none}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}.hot{grid-template-columns:1fr}}
+@media (max-width:520px){header,main{padding:12px 16px}.title{font-size:18px}}
+</style>
+</head>
+<body>
+<header>
+  <span class="logo">SAROGIRI</span>
+  <span class="title">Radar de tendencias</span>
+  <span class="spacer"></span>
+  <span class="mono" id="updated">—</span>
+  <button class="ghost" id="theme" title="Cambiar tema">◐</button>
+  <button class="btn" id="refresh">Actualizar ahora</button>
+</header>
+<main>
+  <section class="kpis">
+    <div class="kpi"><span class="mono">Tendencias activas</span><b id="k-total">0</b></div>
+    <div class="kpi"><span class="mono">Emergentes</span><b id="k-new">0</b></div>
+    <div class="kpi"><span class="mono">Saltaron de plataforma</span><b id="k-jump">0</b></div>
+    <div class="kpi"><span class="mono">Aptas para experiencia</span><b id="k-exp">0</b></div>
+  </section>
+
+  <h2>Arrancando ahora</h2>
+  <p class="sub">Emergentes con mejor puntaje: aparecieron hace poco, suben rápido o ya se ven en más de una plataforma.</p>
+  <section class="hot" id="hot"></section>
+
+  <h2>Todas las tendencias</h2>
+  <p class="sub">Tocá una tarjeta para ver dónde aparece y los links.</p>
+  <section class="filters">
+    <input type="search" id="q" placeholder="Buscar tendencia…">
+    <div class="group" id="f-stage"><span class="mono">Etapa</span></div>
+    <div class="group" id="f-source"><span class="mono">Fuente</span></div>
+    <div class="group" id="f-region"><span class="mono">Zona</span></div>
+    <div class="group" id="f-cat"><span class="mono">Categoría</span></div>
+    <div class="group"><button class="chip" id="f-jump">Solo las que saltaron</button><button class="chip" id="f-exp">Solo aptas para experiencia</button></div>
+  </section>
+  <section class="grid" id="grid"></section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script>
+const STAGES = ["Emergente","Creciendo","Pico","Saturado"];
+const SOURCES = ["X","Google","Reddit","TikTok"];
+const REGIONS = {"AR":"Argentina","MUNDO":"Mundo"};
+const REGION_LABEL = {AR:"Argentina",MUNDO:"Mundo",US:"EE.UU.",GB:"Reino Unido",BR:"Brasil",MX:"México",ES:"España",EXPLICA:"OutOfTheLoop"};
+const state = {data:[], q:"", stage:new Set(), source:new Set(), region:new Set(), cat:new Set(), jump:false, exp:false};
+
+function el(tag, cls, text){const e=document.createElement(tag); if(cls) e.className=cls; if(text!=null) e.textContent=text; return e;}
+function toast(msg){const t=document.getElementById("toast"); t.textContent=msg; t.style.display="block"; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display="none",4000);}
+function isAR(t){return t.members.some(m=>m.region==="AR");}
+function isWorld(t){return t.members.some(m=>m.region!=="AR");}
+
+function sparkline(ranks){
+  const pts = ranks.slice().reverse();
+  if(pts.filter(r=>r!=null).length<2) return null;
+  const ns="http://www.w3.org/2000/svg", w=100, h=28, max=50;
+  const svg=document.createElementNS(ns,"svg"); svg.setAttribute("viewBox",`0 0 ${w} ${h}`); svg.setAttribute("preserveAspectRatio","none"); svg.classList.add("spark");
+  let d="", pen=false;
+  pts.forEach((r,i)=>{ if(r==null){pen=false;return;} const x=i/(pts.length-1)*w, y=2+(Math.min(r,max)-1)/(max-1)*(h-4); d+=(pen?"L":"M")+x.toFixed(1)+" "+y.toFixed(1)+" "; pen=true; });
+  const p=document.createElementNS(ns,"path"); p.setAttribute("d",d); p.setAttribute("fill","none"); p.setAttribute("stroke","var(--blue)"); p.setAttribute("stroke-width","2"); p.setAttribute("vector-effect","non-scaling-stroke");
+  svg.appendChild(p); return svg;
+}
+
+function card(t, big){
+  const c=el("article","card"+(big?" big":""));
+  const top=el("div","row");
+  top.append(el("span","badge b-"+t.stage,t.stage), el("span","cat",t.category), el("span","score",Math.round(t.score)));
+  c.append(top, el("div","kw",t.keyword));
+  const plats=el("div","row");
+  t.platforms.forEach(p=>plats.append(el("span","plat p-"+p,p)));
+  if(t.jumped) plats.append(el("span","flag","↗ saltó de plataforma"));
+  if(t.experience_friendly) plats.append(el("span","meta","· apta para experiencia"));
+  c.append(plats);
+  const bits=[];
+  if(t.source==="X"){const e=t.extra; bits.push(e.is_new?"Nuevo en X esta hora":`${e.hours_in_trending}h en tendencia en X`); if(e.rank_prev_hour) bits.push(`#${e.rank_prev_hour} → #${t.rank}`);}
+  else bits.push(`#${t.rank} en ${t.source} ${REGION_LABEL[t.region]||t.region}`);
+  if(t.traffic) bits.push(t.source==="Google"?t.traffic+" búsquedas":t.traffic);
+  bits.push("En: "+t.seen_in.map(s=>{const [a,b]=s.split(" ");return a+" "+(REGION_LABEL[b]||b);}).join(", "));
+  c.append(el("div","meta",bits.join(" · ")));
+  if(t.source==="X" && t.extra.rank_history){const s=sparkline(t.extra.rank_history); if(s) c.append(s);}
+  const det=el("div","detail"); const ul=el("ul");
+  t.members.forEach(m=>{const li=el("li"); const a=el("a",null,`${m.source} ${REGION_LABEL[m.region]||m.region} · #${m.rank} · ${m.keyword}`); if(/^https?:\/\//.test(m.url)){a.href=m.url;a.target="_blank";a.rel="noopener";} li.append(a); ul.append(li);});
+  if(t.extra && t.extra.news) det.append(el("div","meta","Noticia: "+t.extra.news));
+  det.append(ul); c.append(det);
+  c.addEventListener("click",e=>{if(e.target.tagName!=="A") c.classList.toggle("open");});
+  return c;
+}
+
+function passes(t){
+  if(state.q && !(t.keyword+" "+t.members.map(m=>m.keyword).join(" ")).toLowerCase().includes(state.q)) return false;
+  if(state.stage.size && !state.stage.has(t.stage)) return false;
+  if(state.source.size && !t.platforms.some(p=>state.source.has(p))) return false;
+  if(state.region.size && !((state.region.has("AR")&&isAR(t))||(state.region.has("MUNDO")&&isWorld(t)))) return false;
+  if(state.cat.size && !state.cat.has(t.category)) return false;
+  if(state.jump && !t.jumped) return false;
+  if(state.exp && !t.experience_friendly) return false;
+  return true;
+}
+
+function render(){
+  const d=state.data;
+  document.getElementById("k-total").textContent=d.length;
+  document.getElementById("k-new").textContent=d.filter(t=>t.stage==="Emergente").length;
+  document.getElementById("k-jump").textContent=d.filter(t=>t.jumped).length;
+  document.getElementById("k-exp").textContent=d.filter(t=>t.experience_friendly).length;
+  const hot=document.getElementById("hot"); hot.replaceChildren();
+  d.filter(t=>t.stage==="Emergente"||t.stage==="Creciendo").slice(0,6).forEach(t=>hot.append(card(t,true)));
+  const grid=document.getElementById("grid"); grid.replaceChildren();
+  const list=d.filter(passes);
+  if(!list.length) grid.append(el("div","empty","No hay tendencias con esos filtros."));
+  list.forEach(t=>grid.append(card(t,false)));
+}
+
+function chips(id, values, set, labels){
+  const g=document.getElementById(id); g.querySelectorAll(".chip").forEach(c=>c.remove());
+  values.forEach(v=>{const b=el("button","chip"+(set.has(v)?" on":""),labels?labels[v]:v); b.onclick=()=>{set.has(v)?set.delete(v):set.add(v); b.classList.toggle("on"); render();}; g.append(b);});
+}
+
+function load(payload){
+  state.data=payload.trends||[];
+  const u=payload.updated_at; document.getElementById("updated").textContent=u?"Actualizado "+new Date(u).toLocaleString("es-AR",{dateStyle:"short",timeStyle:"short"}):"Sin datos todavía";
+  chips("f-stage",STAGES,state.stage); chips("f-source",SOURCES,state.source); chips("f-region",Object.keys(REGIONS),state.region,REGIONS);
+  chips("f-cat",[...new Set(state.data.map(t=>t.category))].sort(),state.cat);
+  render();
+}
+
+const OFFLINE = location.protocol === "file:";
+const LOCAL_SERVER = ["127.0.0.1","localhost"].includes(location.hostname);
+const WEB = !OFFLINE && !LOCAL_SERVER;
+async function fetchTrends(){
+  if(OFFLINE){ load(window.RADAR_DATA || {trends:[]}); return; }
+  if(WEB){
+    try{ const t=await (await fetch("data.js?t="+Date.now(),{cache:"no-store"})).text(); load(JSON.parse(t.slice(t.indexOf("{"), t.lastIndexOf("}")+1))); }
+    catch(e){ load(window.RADAR_DATA || {trends:[]}); }
+    return;
+  }
+  try{ load(await (await fetch("/api/trends")).json()); }catch(e){ load(window.RADAR_DATA || {trends:[]}); }
+}
+if(!LOCAL_SERVER){
+  const b=document.getElementById("refresh");
+  b.textContent = OFFLINE ? "Para actualizar: abrí «Abrir Radar.bat»" : "Se actualiza sola cada hora";
+  b.disabled=true; b.style.cursor="default";
+}
+
+document.getElementById("refresh").onclick=async e=>{
+  const b=e.currentTarget; b.disabled=true; b.textContent="Buscando tendencias…";
+  try{ const r=await fetch("/api/refresh",{method:"POST"}); const j=await r.json();
+    if(!r.ok) toast(j.error||"Error al actualizar"); else { load(j); const f=Object.keys(j.failures||{}); toast(f.length?"Actualizado. Fallaron: "+f.join(", "):"Actualizado"); } }
+  catch(err){ toast("No se pudo conectar con el servidor"); }
+  b.disabled=false; b.textContent="Actualizar ahora";
+};
+document.getElementById("q").oninput=e=>{state.q=e.target.value.trim().toLowerCase(); render();};
+document.getElementById("f-jump").onclick=e=>{state.jump=!state.jump; e.currentTarget.classList.toggle("on"); render();};
+document.getElementById("f-exp").onclick=e=>{state.exp=!state.exp; e.currentTarget.classList.toggle("on"); render();};
+document.getElementById("theme").onclick=()=>{const r=document.documentElement; const dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches; r.dataset.theme=dark?"light":"dark";};
+fetchTrends();
+setInterval(fetchTrends,60000);
+</script>
+</body>
+</html>
